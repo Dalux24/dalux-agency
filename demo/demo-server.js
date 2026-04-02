@@ -86,13 +86,17 @@ function generarSlotsDemo() {
 const SLOTS_DEMO = generarSlotsDemo();
 
 /**
- * Genera la respuesta simulada de Luna según el mensaje y el estado actual.
+ * Genera la respuesta simulada según el mensaje y el estado actual.
  *
- * @param {string} mensaje   - Mensaje del usuario
- * @param {string} sessionId - ID de la sesión
+ * @param {string} mensaje      - Mensaje del usuario
+ * @param {string} sessionId    - ID de la sesión
+ * @param {string} nombreNegocio - Nombre del negocio (override por URL param)
+ * @param {string} nombreAgente  - Nombre del agente (override por URL param)
  * @returns {{ respuesta: string, intencion: string, citaCreada: boolean }}
  */
-function respuestaSimulada(mensaje, sessionId) {
+function respuestaSimulada(mensaje, sessionId, nombreNegocio, nombreAgente) {
+  const negocio = nombreNegocio || configNegocio?.negocio?.nombre || 'Spa Zenith GDL';
+  const agente  = nombreAgente  || configNegocio?.agente?.nombre  || 'Luna';
   const msg    = mensaje.toLowerCase().trim();
   const sesion = sesionesSimuladas.get(sessionId) || { paso: 'inicio' };
 
@@ -145,7 +149,7 @@ function respuestaSimulada(mensaje, sessionId) {
     const { servicio, slot } = sesion;
     sesionesSimuladas.set(sessionId, { paso: 'completado' });
     return {
-      respuesta: `¡Listo, ${nombre}! Tu cita está confirmada ✅\n\n📅 *${slot.fecha}*\n⏰ *${slot.hora}*\n💆 *${servicio.nombre}* — $${servicio.precio} MXN\n\nTe esperamos en Spa Zenith GDL 🌿\nSi necesitas cancelar, contáctanos con al menos 24 horas de anticipación.`,
+      respuesta: `¡Listo, ${nombre}! Tu cita está confirmada ✅\n\n📅 *${slot.fecha}*\n⏰ *${slot.hora}*\n💆 *${servicio.nombre}* — $${servicio.precio} MXN\n\nTe esperamos en ${negocio} 🌿\nSi necesitas cancelar, contáctanos con al menos 24 horas de anticipación.`,
       intencion: 'agendar',
       citaCreada: true,
     };
@@ -156,7 +160,7 @@ function respuestaSimulada(mensaje, sessionId) {
   // Saludo
   if (/^(hola|buenos|buenas|hey|buen día|saludos|hi)/i.test(msg)) {
     return {
-      respuesta: `¡Hola! Bienvenid@ a Spa Zenith GDL 🌿 Soy Luna, tu asistente virtual.\n\n¿En qué te puedo ayudar hoy? Puedo darte información sobre nuestros servicios, precios, horarios o ayudarte a agendar una cita 😊`,
+      respuesta: `¡Hola! Bienvenid@ a ${negocio} 🌿 Soy ${agente}, tu asistente virtual.\n\n¿En qué te puedo ayudar hoy? Puedo darte información sobre nuestros servicios, precios, horarios o ayudarte a agendar una cita 😊`,
       intencion: 'saludo',
       citaCreada: false,
     };
@@ -213,7 +217,7 @@ function respuestaSimulada(mensaje, sessionId) {
   // Gracias / despedida
   if (/gracia|gracias|perfecto|excelente|hasta|bye|adios/i.test(msg)) {
     return {
-      respuesta: `¡Fue un placer atenderte! 🌿 Te esperamos en Spa Zenith GDL. Que tengas un excelente día 😊`,
+      respuesta: `¡Fue un placer atenderte! 🌿 Te esperamos en ${negocio}. Que tengas un excelente día 😊`,
       intencion: 'saludo',
       citaCreada: false,
     };
@@ -245,7 +249,7 @@ app.get('/', (req, res) => {
  * Response: { respuesta: string, intencion: string, citaCreada: boolean, modo: 'real'|'simulado' }
  */
 app.post('/chat', async (req, res) => {
-  const { mensaje, sessionId } = req.body;
+  const { mensaje, sessionId, negocio, agente } = req.body;
 
   if (!mensaje || typeof mensaje !== 'string') {
     return res.status(400).json({ error: 'El campo "mensaje" es requerido' });
@@ -274,7 +278,7 @@ app.post('/chat', async (req, res) => {
     // ── Fallback: Modo Simulado ────────────────────────────────────────────
     console.log(`[Demo] API no disponible (${errorApi.message?.slice(0, 60)}…) — usando modo simulado`);
 
-    const simulado = respuestaSimulada(mensaje.trim(), sessionId || 'default');
+    const simulado = respuestaSimulada(mensaje.trim(), sessionId || 'default', negocio, agente);
 
     return res.json({
       ...simulado,

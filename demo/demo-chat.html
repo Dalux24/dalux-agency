@@ -609,15 +609,31 @@
     const SESSION_ID = 'demo_' + Math.random().toString(36).slice(2, 10);
     let esperandoRespuesta = false;
 
+    // Leer parámetros de la URL (?negocio=...&agente=...)
+    const params      = new URLSearchParams(window.location.search);
+    const NEGOCIO_URL = params.get('negocio') || null;
+    const AGENTE_URL  = params.get('agente')  || null;
+
     // ─── Inicialización ──────────────────────────────────────────
 
     window.addEventListener('DOMContentLoaded', async () => {
-      // Cargar nombre del negocio desde el servidor
-      try {
-        const cfg = await fetch('/config').then(r => r.json());
-        document.getElementById('contact-name').textContent  = cfg.nombre  || 'Spa Zenith GDL';
-        document.getElementById('agent-status').textContent  = (cfg.agente || 'Luna') + ' · en línea';
-      } catch { /* usar valores por defecto */ }
+      let nombreNegocio = 'Spa Zenith GDL';
+      let nombreAgente  = 'Luna';
+
+      // Prioridad: URL params > config del servidor
+      if (NEGOCIO_URL || AGENTE_URL) {
+        nombreNegocio = NEGOCIO_URL || nombreNegocio;
+        nombreAgente  = AGENTE_URL  || nombreAgente;
+      } else {
+        try {
+          const cfg = await fetch('/config').then(r => r.json());
+          nombreNegocio = cfg.nombre || nombreNegocio;
+          nombreAgente  = cfg.agente || nombreAgente;
+        } catch { /* usar valores por defecto */ }
+      }
+
+      document.getElementById('contact-name').textContent = nombreNegocio;
+      document.getElementById('agent-status').textContent = nombreAgente + ' · en línea';
 
       // Ajuste de altura dinámica del textarea
       const input = document.getElementById('msg-input');
@@ -638,7 +654,7 @@
 
       // Mostrar mensaje de bienvenida del agente después de un breve delay
       setTimeout(() => {
-        agregarMensaje('agent', '¡Hola! Soy Luna, asistente virtual de Spa Zenith 🌿\n\n¿En qué te puedo ayudar hoy?');
+        agregarMensaje('agent', `¡Hola! Soy ${nombreAgente}, asistente virtual de ${nombreNegocio} 🌿\n\n¿En qué te puedo ayudar hoy?`);
       }, 600);
     });
 
@@ -663,7 +679,7 @@
         const resp = await fetch('/chat', {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ mensaje, sessionId: SESSION_ID }),
+          body:    JSON.stringify({ mensaje, sessionId: SESSION_ID, negocio: NEGOCIO_URL, agente: AGENTE_URL }),
         });
 
         const data = await resp.json();
