@@ -75,13 +75,6 @@ router.post('/twilio', express.urlencoded({ extended: false }), async (req, res)
     // Procesar mensaje con el agente IA
     const resultado = await agente.procesarMensaje(userId, mensaje, 'whatsapp');
 
-    // Enviar respuesta de vuelta al usuario via Twilio
-    await clienteTwilio.messages.create({
-      from: process.env.TWILIO_WHATSAPP_NUMBER || To,
-      to:   From,
-      body: resultado.respuesta,
-    });
-
     // Registrar la interacción en el log
     _registrarConversacion({
       canal:     'whatsapp_twilio',
@@ -92,12 +85,21 @@ router.post('/twilio', express.urlencoded({ extended: false }), async (req, res)
       escalado:  resultado.escalado,
     });
 
-    // Twilio espera una respuesta 200 OK (sin cuerpo de TwiML, ya enviamos el mensaje)
-    res.status(200).send('OK');
+    // Responder con TwiML — Twilio envía el mensaje automáticamente sin necesitar credenciales
+    res.set('Content-Type', 'text/xml');
+    res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Message>${resultado.respuesta.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</Message>
+</Response>`);
 
   } catch (error) {
     console.error('[Webhook/Twilio] Error procesando mensaje:', error.message);
-    res.status(500).send('Error interno');
+    // Responder con TwiML de error para que Twilio no reintente indefinidamente
+    res.set('Content-Type', 'text/xml');
+    res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?>
+<Response>
+  <Message>Lo siento, tuve un problema técnico. Por favor intenta de nuevo en un momento.</Message>
+</Response>`);
   }
 });
 
