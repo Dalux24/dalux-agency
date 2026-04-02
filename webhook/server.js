@@ -41,6 +41,10 @@ app.use(express.json());
 // Webhooks de canales (Twilio, Meta WhatsApp, Instagram)
 app.use('/webhook', webhookRouter);
 
+// Demo público — monta el router del demo en la raíz
+const demoRouter = require('../demo/demo-server');
+app.use('/', demoRouter);
+
 // Dashboard operativo (sirve archivos estáticos del directorio /dashboard)
 const rutaDashboard = path.join(__dirname, '../dashboard');
 if (fs.existsSync(rutaDashboard)) {

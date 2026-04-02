@@ -292,13 +292,14 @@ function respuestaSimulada(mensaje, sessionId, nombreNegocio, nombreAgente, tipo
   };
 }
 
-// ─── App Express ──────────────────────────────────────────────────────────────
+// ─── Router Express ───────────────────────────────────────────────────────────
+// Se exporta como router para montarse en server.js (producción/Render).
+// Cuando se corre directamente (node demo/demo-server.js), arranca su propio servidor.
 
-const app = express();
-app.use(express.json());
+const router = express.Router();
 
 // Servir demo-chat.html en la raíz
-app.get('/', (req, res) => {
+router.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'demo-chat.html'));
 });
 
@@ -309,7 +310,7 @@ app.get('/', (req, res) => {
  * Body:     { mensaje: string, sessionId: string }
  * Response: { respuesta: string, intencion: string, citaCreada: boolean, modo: 'real'|'simulado' }
  */
-app.post('/chat', async (req, res) => {
+router.post('/chat', express.json(), async (req, res) => {
   const { mensaje, sessionId, negocio, agente, tipo } = req.body;
 
   if (!mensaje || typeof mensaje !== 'string') {
@@ -352,7 +353,7 @@ app.post('/chat', async (req, res) => {
 /**
  * GET /config — Datos básicos del negocio para la UI del chat
  */
-app.get('/config', (req, res) => {
+router.get('/config', (req, res) => {
   try {
     const config = loadBusinessConfig(BUSINESS_ID_DEMO);
     res.json({
@@ -366,29 +367,40 @@ app.get('/config', (req, res) => {
   }
 });
 
-// ─── Iniciar servidor y abrir navegador ──────────────────────────────────────
+// ─── Exportar router (para server.js en producción/Render) ───────────────────
+module.exports = router;
 
-app.listen(PUERTO_DEMO, async () => {
-  console.log('');
-  console.log('╔═══════════════════════════════════════════════════╗');
-  console.log('║   🎯  Dalux Agency — MODO DEMO                    ║');
-  console.log('╠═══════════════════════════════════════════════════╣');
-  console.log(`║   URL:     ${URL_DEMO}                    ║`);
-  console.log(`║   Negocio: Spa Zenith GDL                         ║`);
-  console.log(`║   Agente:  Luna                                    ║`);
-  console.log('║                                                   ║');
-  console.log('║   ✅ Modo real: Claude API (si hay créditos)       ║');
-  console.log('║   🔄 Fallback: Modo simulado (siempre funciona)    ║');
-  console.log('╚═══════════════════════════════════════════════════╝');
-  console.log('');
+// ─── Arrancar servidor propio solo si se ejecuta directamente ────────────────
+// node demo/demo-server.js  →  arranca en puerto 3001 y abre el browser
+// require('./demo-server')  →  solo exporta el router, sin servidor propio
 
-  if (!ES_PRODUCCION) {
-    try {
-      const open = (await import('open')).default;
-      await open(URL_DEMO);
-      console.log('[Demo] Navegador abierto en', URL_DEMO);
-    } catch {
-      console.log(`[Demo] Abre manualmente: ${URL_DEMO}`);
+if (require.main === module) {
+  const app = express();
+  app.use(express.json());
+  app.use('/', router);
+
+  app.listen(PUERTO_DEMO, async () => {
+    console.log('');
+    console.log('╔═══════════════════════════════════════════════════╗');
+    console.log('║   🎯  Dalux Agency — MODO DEMO                    ║');
+    console.log('╠═══════════════════════════════════════════════════╣');
+    console.log(`║   URL:     ${URL_DEMO}                    ║`);
+    console.log(`║   Negocio: Spa Zenith GDL                         ║`);
+    console.log(`║   Agente:  Luna                                    ║`);
+    console.log('║                                                   ║');
+    console.log('║   ✅ Modo real: Claude API (si hay créditos)       ║');
+    console.log('║   🔄 Fallback: Modo simulado (siempre funciona)    ║');
+    console.log('╚═══════════════════════════════════════════════════╝');
+    console.log('');
+
+    if (!ES_PRODUCCION) {
+      try {
+        const open = (await import('open')).default;
+        await open(URL_DEMO);
+        console.log('[Demo] Navegador abierto en', URL_DEMO);
+      } catch {
+        console.log(`[Demo] Abre manualmente: ${URL_DEMO}`);
+      }
     }
-  }
-});
+  });
+}

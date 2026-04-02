@@ -1,1 +1,1 @@
-web: node demo/demo-server.js
+web: node webhook/server.js
