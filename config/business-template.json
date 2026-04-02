@@ -1,0 +1,50 @@
+{
+  "_instrucciones": "Copia este archivo a config/businesses/tu-negocio.json y rellena cada campo. Los campos que empiezan con _ son comentarios explicativos, puedes eliminarlos.",
+
+  "negocio": {
+    "id":          "nombre-unico-sin-espacios",
+    "nombre":      "Nombre del Negocio",
+    "tipo":        "spa | dentista | veterinaria | barbería | consultorio | yoga | otra",
+    "direccion":   "Calle, Número, Colonia, Guadalajara, Jalisco",
+    "telefono":    "+52 33 XXXX XXXX",
+    "zonaHoraria": "America/Mexico_City"
+  },
+
+  "agente": {
+    "nombre": "Sofía",
+    "_nota": "Nombre con el que el agente se presenta al cliente: 'Hola, soy Sofía de...'"
+  },
+
+  "tono": "amigable",
+  "_tono_opciones": "formal | amigable | profesional",
+
+  "horarios": {
+    "dias": {
+      "Lunes":     { "abre": "09:00", "cierra": "18:00" },
+      "Martes":    { "abre": "09:00", "cierra": "18:00" },
+      "Miércoles": { "abre": "09:00", "cierra": "18:00" },
+      "Jueves":    { "abre": "09:00", "cierra": "18:00" },
+      "Viernes":   { "abre": "09:00", "cierra": "18:00" },
+      "Sábado":    { "abre": "10:00", "cierra": "14:00" },
+      "Domingo":   { "abre": "Cerrado", "cierra": "Cerrado" }
+    }
+  },
+
+  "servicios": [
+    {
+      "nombre":   "Servicio Ejemplo",
+      "precio":   500,
+      "duracion": 60,
+      "_nota":    "precio en MXN, duracion en minutos"
+    }
+  ],
+
+  "politicaCancelacion": "Cancelaciones con mínimo 24 horas de anticipación. Sin cancelación previa se cobra el 50% del servicio.",
+
+  "agenda": {
+    "tipo": "json_local",
+    "_tipo_opciones": "json_local | google_calendar",
+    "googleCalendarId": "primary",
+    "_googleCalendarId_nota": "Solo si tipo es 'google_calendar'. 'primary' usa el calendario principal de la cuenta Gmail del negocio."
+  }
+}

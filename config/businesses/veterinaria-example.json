@@ -1,0 +1,47 @@
+{
+  "negocio": {
+    "id":          "veterinaria-petcare",
+    "nombre":      "Veterinaria PetCare GDL",
+    "tipo":        "veterinaria",
+    "direccion":   "Calle Manuel Acuña 578, Col. Villaseñor, Guadalajara, Jalisco",
+    "telefono":    "+52 33 3827 4491",
+    "zonaHoraria": "America/Mexico_City"
+  },
+
+  "agente": {
+    "nombre": "Sofía"
+  },
+
+  "tono": "amigable",
+
+  "horarios": {
+    "dias": {
+      "Lunes":     { "abre": "09:00", "cierra": "20:00" },
+      "Martes":    { "abre": "09:00", "cierra": "20:00" },
+      "Miércoles": { "abre": "09:00", "cierra": "20:00" },
+      "Jueves":    { "abre": "09:00", "cierra": "20:00" },
+      "Viernes":   { "abre": "09:00", "cierra": "20:00" },
+      "Sábado":    { "abre": "10:00", "cierra": "15:00" },
+      "Domingo":   { "abre": "10:00", "cierra": "13:00" }
+    }
+  },
+
+  "servicios": [
+    { "nombre": "Consulta general",              "precio": 350,  "duracion": 30  },
+    { "nombre": "Vacunación (paquete básico)",   "precio": 450,  "duracion": 20  },
+    { "nombre": "Baño y corte canino pequeño",   "precio": 280,  "duracion": 60  },
+    { "nombre": "Baño y corte canino mediano",   "precio": 380,  "duracion": 75  },
+    { "nombre": "Baño y corte canino grande",    "precio": 480,  "duracion": 90  },
+    { "nombre": "Baño y corte felino",           "precio": 320,  "duracion": 60  },
+    { "nombre": "Desparasitación",               "precio": 200,  "duracion": 15  },
+    { "nombre": "Esterilización (consulta)",     "precio": 400,  "duracion": 30  },
+    { "nombre": "Radiografía",                   "precio": 600,  "duracion": 20  }
+  ],
+
+  "politicaCancelacion": "Puedes cancelar o reagendar con al menos 12 horas de anticipación. Entendemos que las emergencias con tus mascotas son impredecibles — contáctanos y buscamos solución. 🐾",
+
+  "agenda": {
+    "tipo": "json_local",
+    "googleCalendarId": "primary"
+  }
+}

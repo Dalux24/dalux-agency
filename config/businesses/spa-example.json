@@ -1,0 +1,47 @@
+{
+  "negocio": {
+    "id":          "spa-example",
+    "nombre":      "Spa Zenith GDL",
+    "tipo":        "spa",
+    "direccion":   "Av. López Mateos Norte 1440, Col. Italia Providencia, Guadalajara, Jalisco",
+    "telefono":    "+52 33 3641 7730",
+    "zonaHoraria": "America/Mexico_City"
+  },
+
+  "agente": {
+    "nombre": "Luna"
+  },
+
+  "tono": "amigable",
+
+  "horarios": {
+    "dias": {
+      "Lunes":     { "abre": "10:00", "cierra": "20:00" },
+      "Martes":    { "abre": "10:00", "cierra": "20:00" },
+      "Miércoles": { "abre": "10:00", "cierra": "20:00" },
+      "Jueves":    { "abre": "10:00", "cierra": "20:00" },
+      "Viernes":   { "abre": "10:00", "cierra": "21:00" },
+      "Sábado":    { "abre": "09:00", "cierra": "21:00" },
+      "Domingo":   { "abre": "10:00", "cierra": "18:00" }
+    }
+  },
+
+  "servicios": [
+    { "nombre": "Masaje relajante 60 min",       "precio": 650,  "duracion": 60  },
+    { "nombre": "Masaje relajante 90 min",       "precio": 900,  "duracion": 90  },
+    { "nombre": "Masaje descontracturante",      "precio": 750,  "duracion": 60  },
+    { "nombre": "Masaje de tejido profundo",     "precio": 850,  "duracion": 60  },
+    { "nombre": "Facial hidratante",             "precio": 700,  "duracion": 60  },
+    { "nombre": "Facial antiedad",               "precio": 950,  "duracion": 75  },
+    { "nombre": "Exfoliación corporal",          "precio": 600,  "duracion": 45  },
+    { "nombre": "Envoltura corporal",            "precio": 800,  "duracion": 60  },
+    { "nombre": "Paquete Pareja (masaje 60 min)","precio": 1200, "duracion": 60  }
+  ],
+
+  "politicaCancelacion": "Cancelaciones con mínimo 24 horas de anticipación. Llegando 15 minutos tarde se reduce el tiempo del servicio para no afectar a otros clientes. Reagendamos con gusto si nos avisas a tiempo. 🌿",
+
+  "agenda": {
+    "tipo": "json_local",
+    "googleCalendarId": "primary"
+  }
+}

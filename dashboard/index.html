@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Dalux Agency</title>
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Favicon inline -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🤖</text></svg>" />
+</head>
+<body>
+
+  <!-- ── Barra superior ─────────────────────────────────────────── -->
+  <header class="topbar">
+    <div class="topbar-brand">
+      <!-- Mismo estilo de logo que dalux-agency.netlify.app -->
+      <span class="topbar-logo">Dalux<span>.</span></span>
+      <div class="topbar-sep"></div>
+      <span class="topbar-business" id="business-name">cargando…</span>
+    </div>
+
+    <div class="topbar-right">
+      <div class="status-badge">
+        <span class="status-dot"></span>
+        Agente activo
+      </div>
+
+      <button class="refresh-btn" id="btn-refresh" title="Actualizar datos">
+        <svg class="refresh-icon" width="13" height="13" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M23 4v6h-6"/><path d="M1 20v-6h6"/>
+          <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+        </svg>
+        Refresh
+      </button>
+
+      <span class="refresh-time" id="refresh-time">—</span>
+    </div>
+  </header>
+
+  <!-- ── Contenido principal ────────────────────────────────────── -->
+  <main class="main">
+
+    <!-- ── Fila 1: Tarjetas de métricas (7 días) ─────────────────── -->
+    <section class="metrics-row" aria-label="Métricas de los últimos 7 días">
+
+      <div class="metric-card blue">
+        <div class="metric-label">Mensajes respondidos · 7d</div>
+        <div class="metric-value" id="metric-mensajes">—</div>
+        <div class="metric-sub">Últimos 7 días</div>
+      </div>
+
+      <div class="metric-card green">
+        <div class="metric-label">Citas agendadas · 7d</div>
+        <div class="metric-value" id="metric-citas">—</div>
+        <div class="metric-sub">Confirmadas</div>
+      </div>
+
+      <div class="metric-card coral">
+        <div class="metric-label">Escalaciones pendientes</div>
+        <div class="metric-value" id="metric-escalaciones">—</div>
+        <div class="metric-sub">Sin atender</div>
+      </div>
+
+      <div class="metric-card amber">
+        <div class="metric-label">Tasa de escalación · 7d</div>
+        <div class="metric-value" id="metric-tasa">—</div>
+        <div class="metric-sub">Sobre total mensajes</div>
+      </div>
+
+    </section>
+
+    <!-- ── Fila 2: Paneles principales ───────────────────────────── -->
+    <section class="panels-grid" aria-label="Paneles operativos">
+
+      <!-- Panel: Conversaciones últimas 24 hrs -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <span class="icon">💬</span>
+            Conversaciones · 24 hrs
+          </h2>
+          <span class="card-badge blue" id="conv-count">0</span>
+        </div>
+        <div class="card-body">
+          <ul class="conv-list" id="conv-list">
+            <li class="empty-state">
+              <span class="empty-icon">💬</span>
+              Cargando…
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Panel: Citas hoy y mañana -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <span class="icon">📅</span>
+            Citas hoy &amp; mañana
+          </h2>
+          <span class="card-badge green" id="citas-count">0</span>
+        </div>
+        <div class="card-body">
+          <ul class="citas-list" id="citas-list">
+            <li class="empty-state">
+              <span class="empty-icon">📅</span>
+              Cargando…
+            </li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Panel: Escalaciones pendientes -->
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">
+            <span class="icon">⚠️</span>
+            Escalaciones
+          </h2>
+          <span class="card-badge coral" id="esc-count">0</span>
+        </div>
+        <div class="card-body">
+          <ul class="esc-list" id="esc-list">
+            <li class="empty-state">
+              <span class="empty-icon">✅</span>
+              Cargando…
+            </li>
+          </ul>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- ── Fila 3: Disponibilidad semanal ────────────────────────── -->
+    <section class="card avail-section" aria-label="Disponibilidad semanal">
+      <div class="card-header">
+        <h2 class="card-title">
+          <span class="icon">🗓</span>
+          Disponibilidad semanal
+        </h2>
+        <span style="font-size:0.75rem; color: var(--text-secondary);">
+          Clic en un slot libre para bloquearlo
+        </span>
+      </div>
+
+      <div class="card-body" style="overflow-x: auto; padding: 16px 20px;">
+        <div class="week-grid" id="week-grid">
+          <div class="empty-state" style="grid-column: 1/-1;">Cargando…</div>
+        </div>
+      </div>
+
+      <div class="avail-legend">
+        <div class="legend-item">
+          <div class="legend-dot libre"></div>
+          Disponible
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot ocupado"></div>
+          Con cita
+        </div>
+        <div class="legend-item">
+          <div class="legend-dot bloqueado"></div>
+          Bloqueado
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Toast de notificaciones (se crea dinámicamente desde JS) -->
+
+  <script src="dashboard.js"></script>
+</body>
+</html>

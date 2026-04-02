@@ -1,0 +1,45 @@
+{
+  "negocio": {
+    "id":          "dentista-guerrero",
+    "nombre":      "Clínica Dental Guerrero",
+    "tipo":        "dentista",
+    "direccion":   "Av. Patria 1220, Col. Jardines de Guadalupe, Zapopan, Jalisco",
+    "telefono":    "+52 33 3615 8842",
+    "zonaHoraria": "America/Mexico_City"
+  },
+
+  "agente": {
+    "nombre": "Valeria"
+  },
+
+  "tono": "profesional",
+
+  "horarios": {
+    "dias": {
+      "Lunes":     { "abre": "09:00", "cierra": "19:00" },
+      "Martes":    { "abre": "09:00", "cierra": "19:00" },
+      "Miércoles": { "abre": "09:00", "cierra": "19:00" },
+      "Jueves":    { "abre": "09:00", "cierra": "19:00" },
+      "Viernes":   { "abre": "09:00", "cierra": "18:00" },
+      "Sábado":    { "abre": "09:00", "cierra": "14:00" },
+      "Domingo":   { "abre": "Cerrado", "cierra": "Cerrado" }
+    }
+  },
+
+  "servicios": [
+    { "nombre": "Limpieza dental",          "precio": 600,  "duracion": 45  },
+    { "nombre": "Consulta y diagnóstico",   "precio": 400,  "duracion": 30  },
+    { "nombre": "Blanqueamiento dental",    "precio": 2500, "duracion": 90  },
+    { "nombre": "Ortodoncia (valoración)",  "precio": 500,  "duracion": 60  },
+    { "nombre": "Extracción simple",        "precio": 800,  "duracion": 30  },
+    { "nombre": "Resina (empaste)",         "precio": 900,  "duracion": 45  },
+    { "nombre": "Endodoncia (muela)",       "precio": 3500, "duracion": 120 }
+  ],
+
+  "politicaCancelacion": "Cancelaciones con mínimo 24 horas de anticipación. Las citas no canceladas a tiempo generan un cargo del 50% del servicio. Para reagendar, contáctenos con anticipación.",
+
+  "agenda": {
+    "tipo": "google_calendar",
+    "googleCalendarId": "primary"
+  }
+}

@@ -1,0 +1,17 @@
+# Dependencias
+node_modules/
+
+# Variables de entorno (contienen API keys y secretos)
+.env
+
+# Datos de clientes y logs (no van al repo)
+data/appointments.json
+data/logs/
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+
+# Editores
+.vscode/
+*.swp
