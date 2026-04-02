@@ -53,13 +53,72 @@ try {
 // Sesiones del modo simulado: sessionId → { paso, servicio, slot }
 const sesionesSimuladas = new Map();
 
-const SERVICIOS_DEMO = configNegocio?.servicios || [
-  { nombre: 'Masaje relajante 60 min', precio: 650, duracion: 60 },
-  { nombre: 'Masaje relajante 90 min', precio: 900, duracion: 90 },
-  { nombre: 'Masaje descontracturante', precio: 750, duracion: 60 },
-  { nombre: 'Facial hidratante', precio: 700, duracion: 60 },
-  { nombre: 'Exfoliación corporal', precio: 600, duracion: 45 },
-];
+// ─── Catálogo de servicios por vertical (precios reales GDL 2025) ─────────────
+const CATALOGO_VERTICALES = {
+  spa: [
+    { nombre: 'Masaje relajante 60 min',      precio: 690,  duracion: 60 },
+    { nombre: 'Masaje relajante 90 min',       precio: 890,  duracion: 90 },
+    { nombre: 'Masaje descontracturante',      precio: 750,  duracion: 60 },
+    { nombre: 'Masaje antiestres',             precio: 700,  duracion: 60 },
+    { nombre: 'Facial hidratante',             precio: 700,  duracion: 60 },
+    { nombre: 'Exfoliación corporal',          precio: 650,  duracion: 45 },
+    { nombre: 'Tratamiento reductivo',         precio: 850,  duracion: 60 },
+    { nombre: 'Paquete pareja (masaje 60 min)',precio: 1300, duracion: 60 },
+  ],
+  dentista: [
+    { nombre: 'Consulta inicial',              precio: 150,  duracion: 20 },
+    { nombre: 'Limpieza dental',               precio: 400,  duracion: 40 },
+    { nombre: 'Resina (empaste)',              precio: 780,  duracion: 30 },
+    { nombre: 'Extracción dental',             precio: 580,  duracion: 30 },
+    { nombre: 'Extracción muela del juicio',   precio: 3080, duracion: 60 },
+    { nombre: 'Endodoncia (canal)',            precio: 2999, duracion: 90 },
+    { nombre: 'Blanqueamiento dental',         precio: 2500, duracion: 60 },
+    { nombre: 'Consulta de seguimiento',       precio: 100,  duracion: 20 },
+  ],
+  veterinaria: [
+    { nombre: 'Consulta general',              precio: 250,  duracion: 20 },
+    { nombre: 'Vacuna antirrábica',            precio: 150,  duracion: 15 },
+    { nombre: 'Paquete de vacunas cachorro',   precio: 350,  duracion: 20 },
+    { nombre: 'Desparasitación',               precio: 180,  duracion: 15 },
+    { nombre: 'Baño y estética (perro chico)', precio: 280,  duracion: 60 },
+    { nombre: 'Baño y estética (perro grande)',precio: 420,  duracion: 90 },
+    { nombre: 'Limpieza de oídos',             precio: 150,  duracion: 15 },
+    { nombre: 'Revisión de seguimiento',       precio: 150,  duracion: 15 },
+  ],
+  barberia: [
+    { nombre: 'Corte clásico',                 precio: 180,  duracion: 30 },
+    { nombre: 'Corte + arreglo de barba',      precio: 280,  duracion: 45 },
+    { nombre: 'Arreglo de barba',              precio: 140,  duracion: 20 },
+    { nombre: 'Corte + lavado + peinado',      precio: 320,  duracion: 50 },
+    { nombre: 'Servicio premium completo',     precio: 480,  duracion: 60 },
+    { nombre: 'Corte infantil',                precio: 130,  duracion: 20 },
+  ],
+  medico: [
+    { nombre: 'Consulta general',              precio: 380,  duracion: 25 },
+    { nombre: 'Consulta de seguimiento',       precio: 300,  duracion: 20 },
+    { nombre: 'Revisión y receta',             precio: 380,  duracion: 20 },
+    { nombre: 'Consulta urgente',              precio: 450,  duracion: 30 },
+    { nombre: 'Exploración física completa',   precio: 420,  duracion: 30 },
+    { nombre: 'Consulta a domicilio',          precio: 600,  duracion: 40 },
+  ],
+  yoga: [
+    { nombre: 'Clase grupal (pase único)',     precio: 320,  duracion: 60 },
+    { nombre: 'Paquete 4 clases',              precio: 750,  duracion: 60 },
+    { nombre: 'Paquete 8 clases',              precio: 1200, duracion: 60 },
+    { nombre: 'Paquete 16 clases',             precio: 1700, duracion: 60 },
+    { nombre: 'Clase privada (1 a 1)',         precio: 500,  duracion: 60 },
+    { nombre: 'Clase semiprivada (2-3 pers.)', precio: 400,  duracion: 60 },
+  ],
+};
+
+/**
+ * Devuelve los servicios correspondientes al tipo de negocio.
+ * Si no hay tipo o no está en el catálogo, usa el config del servidor (spa por defecto).
+ */
+function obtenerServicios(tipo) {
+  if (tipo && CATALOGO_VERTICALES[tipo]) return CATALOGO_VERTICALES[tipo];
+  return configNegocio?.servicios || CATALOGO_VERTICALES.spa;
+}
 
 /**
  * Genera slots de disponibilidad demo para los próximos 4 días hábiles.
@@ -88,24 +147,26 @@ const SLOTS_DEMO = generarSlotsDemo();
 /**
  * Genera la respuesta simulada según el mensaje y el estado actual.
  *
- * @param {string} mensaje      - Mensaje del usuario
- * @param {string} sessionId    - ID de la sesión
- * @param {string} nombreNegocio - Nombre del negocio (override por URL param)
- * @param {string} nombreAgente  - Nombre del agente (override por URL param)
+ * @param {string} mensaje        - Mensaje del usuario
+ * @param {string} sessionId      - ID de la sesión
+ * @param {string} nombreNegocio  - Nombre del negocio (override por URL param)
+ * @param {string} nombreAgente   - Nombre del agente (override por URL param)
+ * @param {string} tipoNegocio    - Vertical del negocio: spa|dentista|veterinaria|barberia|medico|yoga
  * @returns {{ respuesta: string, intencion: string, citaCreada: boolean }}
  */
-function respuestaSimulada(mensaje, sessionId, nombreNegocio, nombreAgente) {
-  const negocio = nombreNegocio || configNegocio?.negocio?.nombre || 'Spa Zenith GDL';
-  const agente  = nombreAgente  || configNegocio?.agente?.nombre  || 'Luna';
+function respuestaSimulada(mensaje, sessionId, nombreNegocio, nombreAgente, tipoNegocio) {
+  const negocio   = nombreNegocio || configNegocio?.negocio?.nombre || 'Spa Zenith GDL';
+  const agente    = nombreAgente  || configNegocio?.agente?.nombre  || 'Luna';
+  const servicios = obtenerServicios(tipoNegocio);
   const msg    = mensaje.toLowerCase().trim();
   const sesion = sesionesSimuladas.get(sessionId) || { paso: 'inicio' };
 
   // ── Flujo de agendamiento activo ──────────────────────────────────────────
   if (sesion.paso === 'esperando_servicio') {
     const num = parseInt(msg);
-    const servicio = (!isNaN(num) && num >= 1 && num <= SERVICIOS_DEMO.length)
-      ? SERVICIOS_DEMO[num - 1]
-      : SERVICIOS_DEMO.find(s => msg.includes(s.nombre.toLowerCase().split(' ')[0]));
+    const servicio = (!isNaN(num) && num >= 1 && num <= servicios.length)
+      ? servicios[num - 1]
+      : servicios.find(s => msg.includes(s.nombre.toLowerCase().split(' ')[0]));
 
     if (servicio) {
       sesionesSimuladas.set(sessionId, { paso: 'esperando_slot', servicio });
@@ -168,7 +229,7 @@ function respuestaSimulada(mensaje, sessionId, nombreNegocio, nombreAgente) {
 
   // Precio
   if (/precio|costo|cuánto|cuanto|cobran|tarifa|vale/i.test(msg)) {
-    const lista = SERVICIOS_DEMO.map(s => `• ${s.nombre}: *$${s.precio} MXN* (${s.duracion} min)`).join('\n');
+    const lista = servicios.map(s => `• ${s.nombre}: *$${s.precio} MXN* (${s.duracion} min)`).join('\n');
     return {
       respuesta: `¡Claro! Estos son nuestros servicios y precios 💆\n\n${lista}\n\n¿Te interesa alguno en particular o quieres agendar una cita?`,
       intencion: 'precio',
@@ -178,7 +239,7 @@ function respuestaSimulada(mensaje, sessionId, nombreNegocio, nombreAgente) {
 
   // Agendar
   if (/agendar|cita|reservar|quiero|apartar|disponib/i.test(msg)) {
-    const lista = SERVICIOS_DEMO.map((s, i) => `${i + 1}. ${s.nombre} — $${s.precio} MXN (${s.duracion} min)`).join('\n');
+    const lista = servicios.map((s, i) => `${i + 1}. ${s.nombre} — $${s.precio} MXN (${s.duracion} min)`).join('\n');
     sesionesSimuladas.set(sessionId, { paso: 'esperando_servicio' });
     return {
       respuesta: `¡Con gusto te ayudo a agendar! 📅\n\n¿Qué servicio te interesa?\n\n${lista}\n\nEscribe el número o el nombre del servicio.`,
@@ -249,7 +310,7 @@ app.get('/', (req, res) => {
  * Response: { respuesta: string, intencion: string, citaCreada: boolean, modo: 'real'|'simulado' }
  */
 app.post('/chat', async (req, res) => {
-  const { mensaje, sessionId, negocio, agente } = req.body;
+  const { mensaje, sessionId, negocio, agente, tipo } = req.body;
 
   if (!mensaje || typeof mensaje !== 'string') {
     return res.status(400).json({ error: 'El campo "mensaje" es requerido' });
@@ -278,7 +339,7 @@ app.post('/chat', async (req, res) => {
     // ── Fallback: Modo Simulado ────────────────────────────────────────────
     console.log(`[Demo] API no disponible (${errorApi.message?.slice(0, 60)}…) — usando modo simulado`);
 
-    const simulado = respuestaSimulada(mensaje.trim(), sessionId || 'default', negocio, agente);
+    const simulado = respuestaSimulada(mensaje.trim(), sessionId || 'default', negocio, agente, tipo);
 
     return res.json({
       ...simulado,

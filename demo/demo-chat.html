@@ -609,10 +609,11 @@
     const SESSION_ID = 'demo_' + Math.random().toString(36).slice(2, 10);
     let esperandoRespuesta = false;
 
-    // Leer parámetros de la URL (?negocio=...&agente=...)
+    // Leer parámetros de la URL (?negocio=...&agente=...&tipo=...)
     const params      = new URLSearchParams(window.location.search);
     const NEGOCIO_URL = params.get('negocio') || null;
     const AGENTE_URL  = params.get('agente')  || null;
+    const TIPO_URL    = params.get('tipo')    || null;
 
     // ─── Inicialización ──────────────────────────────────────────
 
@@ -679,7 +680,7 @@
         const resp = await fetch('/chat', {
           method:  'POST',
           headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ mensaje, sessionId: SESSION_ID, negocio: NEGOCIO_URL, agente: AGENTE_URL }),
+          body:    JSON.stringify({ mensaje, sessionId: SESSION_ID, negocio: NEGOCIO_URL, agente: AGENTE_URL, tipo: TIPO_URL }),
         });
 
         const data = await resp.json();
