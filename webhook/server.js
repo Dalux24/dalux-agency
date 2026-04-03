@@ -63,6 +63,8 @@ app.get('/api/status', (req, res) => {
     version:   '1.0.0',
     timestamp: new Date().toISOString(),
     businessId: process.env.BUSINESS_ID || 'spa-example',
+    apiKeySet: !!process.env.ANTHROPIC_API_KEY,
+    twilioSet: !!process.env.TWILIO_ACCOUNT_SID,
   });
 });
 
@@ -284,6 +286,20 @@ app.use((req, res) => {
       'GET /dashboard',
     ],
   });
+});
+
+// ─── Endpoint de diagnóstico temporal ────────────────────────────────────────
+app.post('/api/test-agente', express.json(), async (req, res) => {
+  try {
+    const { AgentCore }          = require('../agent/agent-core');
+    const { loadBusinessConfig } = require('../config/config-loader');
+    const config    = loadBusinessConfig(process.env.BUSINESS_ID || 'spa-example');
+    const agente    = new AgentCore(config);
+    const resultado = await agente.procesarMensaje('test_debug', req.body?.mensaje || 'Hola', 'whatsapp');
+    res.json({ ok: true, resultado });
+  } catch (e) {
+    res.json({ ok: false, error: e.message, stack: e.stack?.slice(0, 500) });
+  }
 });
 
 // ─── Manejo global de errores ─────────────────────────────────────────────────

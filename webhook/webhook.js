@@ -93,8 +93,7 @@ router.post('/twilio', express.urlencoded({ extended: false }), async (req, res)
 </Response>`);
 
   } catch (error) {
-    console.error('[Webhook/Twilio] Error procesando mensaje:', error.message);
-    // Responder con TwiML de error para que Twilio no reintente indefinidamente
+    console.error('[Webhook/Twilio] Error completo:', error.message, error.stack);
     res.set('Content-Type', 'text/xml');
     res.status(200).send(`<?xml version="1.0" encoding="UTF-8"?>
 <Response>
