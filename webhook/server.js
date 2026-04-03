@@ -41,10 +41,6 @@ app.use(express.json());
 // Webhooks de canales (Twilio, Meta WhatsApp, Instagram)
 app.use('/webhook', webhookRouter);
 
-// Demo público — monta el router del demo en la raíz
-const demoRouter = require('../demo/demo-server');
-app.use('/', demoRouter);
-
 // Dashboard operativo (sirve archivos estáticos del directorio /dashboard)
 const rutaDashboard = path.join(__dirname, '../dashboard');
 if (fs.existsSync(rutaDashboard)) {
@@ -301,6 +297,10 @@ app.post('/api/test-agente', express.json(), async (req, res) => {
     res.json({ ok: false, error: e.message, stack: e.stack?.slice(0, 500) });
   }
 });
+
+// Demo público — al final para no interceptar /api/* ni /webhook ni /dashboard
+const demoRouter = require('../demo/demo-server');
+app.use('/', demoRouter);
 
 // ─── Manejo global de errores ─────────────────────────────────────────────────
 
